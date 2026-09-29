@@ -6,16 +6,16 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard');
+        return view('admin.dashboard');
     }
 
     public function petugas()
     {
-        return view('dashboard');
+        return view('petugas.dashboard');
     }
 
     public function owner()
     {
-        return view('dashboard');
+        return view('owner.dashboard');
     }
 }

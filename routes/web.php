@@ -17,10 +17,10 @@ use App\Http\Controllers\LaporanController;
 | LOGIN
 |--------------------------------------------------------------------------
 */
-Route::get('/', [AuthController::class, 'showLogin'])->name('login');
+Route::get('/', [AuthController::class, 'showLogin']);
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/login', [AuthController::class, 'login'])->name('login.proses');
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -29,24 +29,22 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 */
 Route::middleware(['cekrole:admin'])->group(function () {
 
-    // Dashboard Admin
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-    // Pengguna
     Route::resource('/pengguna', PenggunaController::class)->except(['show']);
 
-    // Tarif
     Route::resource('/tarif', TarifController::class)->except(['show']);
 
-    // Area Parkir (URL: /area-parkir)
-    Route::resource('/area-parkir', AreaParkirController::class)->except(['show'])->names('area');
+    Route::resource('/area-parkir', AreaParkirController::class)
+        ->except(['show'])
+        ->names('area');
 
-    // Kendaraan (URL: /kendaraan)
-    Route::resource('/kendaraan', KendaraanController::class)->except(['show']);
+    Route::resource('/kendaraan', KendaraanController::class)
+        ->except(['show']);
 
-    // Log Aktivitas
-    Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])->name('log.index');
-
+    Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])
+        ->name('log.index');
 });
 
 /*
@@ -86,3 +84,8 @@ Route::middleware(['cekrole:owner'])->group(function () {
 */
 // Sudah diganti menjadi /rekap agar pas dancok/cocok dengan tombol sidebar bos!
 Route::get('/rekap', [LaporanController::class, 'index'])->name('laporan.index');
+
+
+Route::get('/laporan', function () {
+    return view('laporan.index');
+})->name('laporan');

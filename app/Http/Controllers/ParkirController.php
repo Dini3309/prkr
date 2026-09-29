@@ -9,13 +9,24 @@ use App\Models\Tarif;
 class ParkirController extends Controller
 {
     public function index()
-    {
-        // Mengambil data parkir beserta relasi tarifnya agar loading data lebih aman
-        $parkirAktif = Parkir::with('tarif')->get(); 
-        $tarif = Tarif::all(); 
-        
-        return view('parkir.index', compact('parkirAktif', 'tarif'));
-    }
+{
+    $transaksi = Parkir::with('tarif')
+        ->orderBy('id_parkir', 'desc')
+        ->get();
+
+    $totalTransaksi = Parkir::count();
+
+    $totalMasuk = Parkir::where('status', 'masuk')->count();
+
+    $totalKeluar = Parkir::where('status', 'keluar')->count();
+
+    return view('transaksi.index', compact(
+        'transaksi',
+        'totalTransaksi',
+        'totalMasuk',
+        'totalKeluar'
+    ));
+}
 
 
     public function create()

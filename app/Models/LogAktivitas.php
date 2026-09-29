@@ -7,7 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class LogAktivitas extends Model
 {
     protected $table = 'tb_log_aktivitas';
+
     protected $primaryKey = 'id_log';
+
     public $timestamps = false;
-    protected $fillable = ['username', 'aktivitas', 'waktu'];
+
+    protected $fillable = [
+        'id_user',
+        'aktivitas',
+        'waktu_aktivitas',
+    ];
+
+    protected $casts = [
+        'waktu_aktivitas' => 'datetime',
+    ];
 }

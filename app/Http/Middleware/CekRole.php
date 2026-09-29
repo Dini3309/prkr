@@ -27,6 +27,6 @@ class CekRole
         }
 
         // 4. Jika tidak cocok (misal admin mau buka punya owner dan belum diizinkan), lempar 403
-        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+       abort(403, 'Role di session: [' . $userRole . ']');
     }
 }

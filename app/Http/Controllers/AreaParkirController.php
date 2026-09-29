@@ -7,10 +7,12 @@ use Illuminate\Http\Request;
 
 class AreaParkirController extends Controller
 {
+    
     public function index()
     {
-        $area = AreaParkir::all();
-        return view('area.index', compact('area'));
+        $areaParkir = AreaParkir::all();
+
+        return view('area.index', compact('areaParkir'));
     }
 
     public function create()

@@ -2,17 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class PenggunaController extends Controller
 {
     public function index()
     {
-        // Diubah menjadi $users agar cocok dengan @forelse($users as $user) di view Anda
-        $users = User::all();
-        return view('pengguna.index', compact('users'));
+        $pengguna = DB::table('tb_user')
+            ->orderBy('id_user', 'desc')
+            ->get();
+
+        $totalUser = DB::table('tb_user')->count();
+        $totalAdmin = DB::table('tb_user')->where('role', 'admin')->count();
+        $totalPetugas = DB::table('tb_user')->where('role', 'petugas')->count();
+        $totalOwner = DB::table('tb_user')->where('role', 'owner')->count();
+
+        return view('pengguna.index', compact(
+            'pengguna',
+            'totalUser',
+            'totalAdmin',
+            'totalPetugas',
+            'totalOwner'
+        ));
     }
 
     public function create()
@@ -23,61 +36,75 @@ class PenggunaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'username'     => 'required|string|unique:tb_user,username',
-            'password'     => 'required|min:4',
-            'role'         => 'required|in:admin,petugas,owner',
+            'nama' => 'required',
+            'username' => 'required|unique:tb_user,username',
+            'password' => 'required|min:3',
+            'role' => 'required|in:admin,petugas,owner',
+            'email' => 'nullable|email',
         ]);
 
-        User::create([
-            'nama_lengkap' => $request->nama_lengkap,
+        DB::table('tb_user')->insert([
+            'nama_lengkap'         => $request->nama,
             'username'     => $request->username,
             'password'     => Hash::make($request->password),
             'role'         => $request->role,
             'status_aktif' => 1,
         ]);
 
-        return redirect()->route('pengguna.index')->with('sukses', 'Pengguna berhasil ditambahkan.');
+        return redirect('/pengguna')
+            ->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
-    public function edit($id)
+    public function edit($id_user)
     {
-        $pengguna = User::findOrFail($id);
-        return view('pengguna.edit', compact('pengguna'));
+        $pengguna = DB::table('tb_user')
+            ->where('id_user', $id_user)
+            ->first();
+
+        if (!$pengguna) {
+            return redirect('/pengguna')
+                ->with('error', 'Data pengguna tidak ditemukan.');
+        }
+
+        return view('admin.pengguna.edit', compact('pengguna'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id_user)
     {
-        $pengguna = User::findOrFail($id);
-
         $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'username'     => 'required|string|unique:tb_user,username,' . $id,
-            'role'         => 'required|in:admin,petugas,owner',
-            'status_aktif' => 'required|boolean',
+            'nama' => 'required',
+            'username' => 'required',
+            'role' => 'required|in:admin,petugas,owner',
+            'email' => 'nullable|email',
         ]);
 
         $data = [
-            'nama_lengkap' => $request->nama_lengkap,
-            'username'     => $request->username,
-            'role'         => $request->role,
-            'status_aktif' => $request->status_aktif,
+            'nama' => $request->nama,
+            'username' => $request->username,
+            'role' => $request->role,
+            'email' => $request->email,
+            'status_aktif' => $request->status_aktif ?? 1,
         ];
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
-        $pengguna->update($data);
+        DB::table('tb_user')
+            ->where('id_user', $id_user)
+            ->update($data);
 
-        return redirect()->route('pengguna.index')->with('sukses', 'Data pengguna berhasil diperbarui.');
+        return redirect('/pengguna')
+            ->with('success', 'Pengguna berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy($id_user)
     {
-        $pengguna = User::findOrFail($id);
-        $pengguna->delete();
+        DB::table('tb_user')
+            ->where('id_user', $id_user)
+            ->delete();
 
-        return redirect()->route('pengguna.index')->with('sukses', 'Pengguna berhasil dihapus.');
+        return redirect('/pengguna')
+            ->with('success', 'Pengguna berhasil dihapus.');
     }
 }

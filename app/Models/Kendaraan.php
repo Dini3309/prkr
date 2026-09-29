@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kendaraan extends Model
 {
-    // Nama tabel database Anda
-    protected $table = 'tb_kendaraan'; 
+    protected $table = 'tb_kendaraan';
 
-    // WAJIB TAMBAHKAN BARIS INI:
+    protected $primaryKey = 'id_kendaraan';
+
     protected $fillable = [
         'plat_nomor',
         'jenis_kendaraan',
@@ -17,4 +17,6 @@ class Kendaraan extends Model
         'merk',
         'nama_pemilik'
     ];
+
+    public $timestamps = false;
 }
